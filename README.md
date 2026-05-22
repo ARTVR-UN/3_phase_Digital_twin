@@ -1,5 +1,4 @@
 # 3-Phase Alternator Digital Twin
-## A LinkedIn-Worthy Power Electronics + Robotics Project
 
 ---
 
