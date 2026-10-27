@@ -15,6 +15,7 @@ from pathlib import Path
 # Add core module to path
 current_dir = Path(__file__).parent.absolute()
 core_path = current_dir / "core"
+out_dir = current_dir / "docs"  # figures go to docs/
 sys.path.insert(0, str(core_path))
 
 from physics_engine import ThreePhaseRectifier, AlternatorParams
@@ -84,19 +85,19 @@ def run_complete_simulation():
     
     # Main rectification stages
     fig1 = plot_rectification_stages(t, Va, Vb, Vc, V_rectified, V_filtered)
-    fig1.savefig(current_dir / 'rectification_stages.png', dpi=300, bbox_inches='tight')
+    fig1.savefig(out_dir / 'rectification_stages.png', dpi=300, bbox_inches='tight')
     print("      ✓ Saved: rectification_stages.png")
     
     # Load variation analysis
     fig2, fig3 = plot_load_variation_analysis([5, 10, 15, 20])
-    fig2.savefig(current_dir / 'load_variation_waveforms.png', dpi=300, bbox_inches='tight')
-    fig3.savefig(current_dir / 'load_regulation_analysis.png', dpi=300, bbox_inches='tight')
+    fig2.savefig(out_dir / 'load_variation_waveforms.png', dpi=300, bbox_inches='tight')
+    fig3.savefig(out_dir / 'load_regulation_analysis.png', dpi=300, bbox_inches='tight')
     print("      ✓ Saved: load_variation_waveforms.png")
     print("      ✓ Saved: load_regulation_analysis.png")
     
     # Power dissipation
     fig4 = plot_power_dissipation_heatmap(t, V_filtered, I_capacitor)
-    fig4.savefig(current_dir / 'power_dissipation.png', dpi=300, bbox_inches='tight')
+    fig4.savefig(out_dir / 'power_dissipation.png', dpi=300, bbox_inches='tight')
     print("      ✓ Saved: power_dissipation.png")
     
     # === Summary Report ===
@@ -110,7 +111,7 @@ System Performance Metrics:
   • Ripple suppression ratio: {(v_rect_ripple/v_ripple_pp):.1f}×
   • Thermal dissipation: {p_total*1000:.2f} mW (suitable for ECU cooling design)
 
-Key Insights for LinkedIn Portfolio:
+Key insights:
   ✓ Modeled real-world alternator physics (commutation, leakage inductance)
   ✓ Demonstrated load regulation degradation (higher current → lower voltage)
   ✓ Designed capacitor filter for ECU power stability

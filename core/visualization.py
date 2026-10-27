@@ -8,8 +8,6 @@ Creates publication-quality plots showing:
 3. Filtered DC output and ripple
 4. Load-dependent effects
 
-Perfect for LinkedIn portfolio showcase.
-
 Author: Digital Twin Project
 """
 

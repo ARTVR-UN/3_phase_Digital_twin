@@ -4,9 +4,6 @@ Extension Examples - Building on the Digital Twin
 
 This file shows how to extend the digital twin with new features.
 Each example is self-contained and can be run independently.
-
-Perfect for showing recruiters you understand how to build modular,
-extensible software.
 """
 
 import numpy as np
@@ -14,7 +11,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
 
-core_path = Path(__file__).parent.absolute() / "core"
+core_path = Path(__file__).parent.parent.absolute() / "core"
 sys.path.insert(0, str(core_path))
 
 from physics_engine import ThreePhaseRectifier, AlternatorParams
@@ -32,9 +29,6 @@ class TemperatureAwareAlternator(ThreePhaseRectifier):
     Real alternators have temperature-dependent resistance:
     - Cold start: Lower resistance, better voltage regulation
     - Hot operation: Higher resistance, voltage sag increases
-    
-    This is a great example to show on LinkedIn:
-    "Adding temperature-dependent effects to my digital twin..."
     """
     
     def __init__(self, params=None, initial_temp_celsius=25):
@@ -112,7 +106,7 @@ def example_1_temperature_effects():
     ax.set_title('Voltage Regulation vs Temperature\n(Cold start better than hot!)')
     
     plt.tight_layout()
-    current_dir = Path(__file__).parent.absolute()
+    current_dir = Path(__file__).parent.parent.absolute() / "docs"  # figures go to docs/
     plt.savefig(current_dir / 'extension_1_temperature.png', dpi=300, bbox_inches='tight')
     print(f"\n  ✓ Saved: extension_1_temperature.png")
 
@@ -198,7 +192,7 @@ def example_2_battery_effects():
                arrowprops=dict(arrowstyle='->', color='red'))
     
     plt.tight_layout()
-    current_dir = Path(__file__).parent.absolute()
+    current_dir = Path(__file__).parent.parent.absolute() / "docs"  # figures go to docs/
     plt.savefig(current_dir / 'extension_2_battery_droop.png', dpi=300, bbox_inches='tight')
     print(f"\n  ✓ Saved: extension_2_battery_droop.png")
 
@@ -285,7 +279,7 @@ def example_3_ecu_load_profiles():
         print(f"    Power dissipation: {p_total*1000:.0f}mW")
     
     plt.tight_layout()
-    current_dir = Path(__file__).parent.absolute()
+    current_dir = Path(__file__).parent.parent.absolute() / "docs"  # figures go to docs/
     plt.savefig(current_dir / 'extension_3_ecu_profiles.png', dpi=300, bbox_inches='tight')
     print(f"\n  ✓ Saved: extension_3_ecu_profiles.png")
 
@@ -351,7 +345,7 @@ def example_4_harmonic_analysis():
             ax.axvline(x=harm, color='r', linestyle='--', alpha=0.5)
     
     plt.tight_layout()
-    current_dir = Path(__file__).parent.absolute()
+    current_dir = Path(__file__).parent.parent.absolute() / "docs"  # figures go to docs/
     plt.savefig(current_dir / 'extension_4_harmonics.png', dpi=300, bbox_inches='tight')
     
     # Print harmonics
@@ -374,7 +368,6 @@ def main():
     print("DIGITAL TWIN EXTENSIONS - Advanced Features")
     print("="*80)
     print("\nThese examples show how to extend the core digital twin.")
-    print("Perfect for demonstrating software engineering skills to recruiters!")
     
     example_1_temperature_effects()
     example_2_battery_effects()
@@ -390,15 +383,6 @@ Generated files:
   • extension_2_battery_droop.png - Why lights dim during start
   • extension_3_ecu_profiles.png - Different operating scenarios
   • extension_4_harmonics.png - Frequency domain analysis
-
-LinkedIn Value:
-  These extensions show:
-  ✓ Modular, extensible software design
-  ✓ Deep understanding of systems complexity
-  ✓ Ability to model real-world phenomena
-  ✓ Professional visualization skills
-
-Each one is a separate LinkedIn post opportunity!
     """)
 
 
