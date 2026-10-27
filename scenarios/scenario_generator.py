@@ -1,9 +1,9 @@
 """
-LinkedIn Post Template Generator
-=================================
+Operating Scenario Generator
+============================
 
-This script generates different scenarios and analyses that are perfect
-for LinkedIn posts. Use these to showcase different aspects of the project.
+Runs three operating scenarios (cold start, sustained load, full load range)
+and saves one figure for each in docs/.
 
 Each scenario emphasizes a different engineering challenge.
 """
@@ -14,7 +14,7 @@ from pathlib import Path
 
 # Add core to path
 import sys
-core_path = Path(__file__).parent.absolute() / "core"
+core_path = Path(__file__).parent.parent.absolute() / "core"
 sys.path.insert(0, str(core_path))
 
 from physics_engine import ThreePhaseRectifier, AlternatorParams
@@ -26,7 +26,7 @@ def scenario_1_cold_start():
     Scenario 1: Cold Engine Start (High Inrush Current)
     
     Shows how the alternator struggles to maintain voltage during
-    high-current engine start. Perfect for automotive-focused LinkedIn post.
+    high-current engine start.
     """
     print("\n" + "="*70)
     print("SCENARIO 1: Cold Engine Start (Inrush Current Analysis)")
@@ -71,7 +71,7 @@ def scenario_1_cold_start():
         print(f"  {I_load}A load: DC voltage = {v_dc:.2f}V (sag = {v_sag:.2f}V, µ = {u_deg:.1f}°)")
     
     plt.tight_layout()
-    current_dir = Path(__file__).parent.absolute()
+    current_dir = Path(__file__).parent.parent.absolute() / "docs"  # figures go to docs/
     plt.savefig(current_dir / 'scenario_1_cold_start.png', dpi=300, bbox_inches='tight')
     print(f"\n  ✓ Saved: scenario_1_cold_start.png")
     return fig
@@ -175,7 +175,7 @@ This energy becomes heat on the ECU board!
             family='monospace')
     
     plt.tight_layout()
-    current_dir = Path(__file__).parent.absolute()
+    current_dir = Path(__file__).parent.parent.absolute() / "docs"  # figures go to docs/
     plt.savefig(current_dir / 'scenario_2_sustained_load.png', dpi=300, bbox_inches='tight')
     print(f"\n  Load current: 18A (AC compressor maximum)")
     print(f"  Average DC voltage: {v_dc:.2f}V")
@@ -274,7 +274,7 @@ def scenario_3_efficiency_analysis():
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    current_dir = Path(__file__).parent.absolute()
+    current_dir = Path(__file__).parent.parent.absolute() / "docs"  # figures go to docs/
     plt.savefig(current_dir / 'scenario_3_efficiency.png', dpi=300, bbox_inches='tight')
     
     print(f"\n  At 5A load:  DC voltage = {metrics['dc_voltage'][4]:.2f}V")
@@ -288,9 +288,9 @@ def scenario_3_efficiency_analysis():
 def main():
     """Generate all scenario analyses."""
     print("\n" + "="*80)
-    print("LINKEDIN PORTFOLIO SCENARIO GENERATOR")
+    print("OPERATING SCENARIOS")
     print("="*80)
-    print("\nGenerating detailed scenario analyses for LinkedIn posts...")
+    print("\nGenerating scenario analyses...")
     
     scenario_1_cold_start()
     scenario_2_sustained_load()
@@ -304,18 +304,6 @@ Generated files:
   • scenario_1_cold_start.png - High inrush current during engine start
   • scenario_2_sustained_load.png - AC compressor running continuously
   • scenario_3_efficiency.png - Full load range analysis
-
-LinkedIn Post Ideas:
-  1. "Why Your Car's Lights Dim When You Turn On the AC"
-     Use scenario_1_cold_start.png to show voltage collapse
-  
-  2. "The Physics Behind Automotive Power Systems"
-     Use scenario_2_sustained_load.png to show thermal analysis
-  
-  3. "System Efficiency Across Operating Range"
-     Use scenario_3_efficiency.png to demonstrate engineering trade-offs
-
-All visualizations are 300 DPI, ready for LinkedIn publishing! 📊
     """)
 
 
