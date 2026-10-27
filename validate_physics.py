@@ -57,7 +57,6 @@ def verify_commutation_formula():
     print("  • At 10A (normal driving): 41.4° overlap")
     print("  • At 20A (AC + headlights): 60° overlap = 1/6 of AC cycle!")
     print("  • Beyond 25A: System approaching instability")
-    print("\n  ✓ This matches real automotive alternator behavior")
 
 
 def verify_rectification_formula():
@@ -68,22 +67,27 @@ def verify_rectification_formula():
     
     rect = ThreePhaseRectifier()
     
-    print("\nFormula (standard power electronics):")
-    print("  V_dc_ideal = (3 * √2 / π) * V_ac_peak")
-    print("            ≈ 1.35 * V_ac_peak")
+    print("\nFormula (6-pulse bridge, V_peak = phase peak):")
+    print("  V_dc_ideal = (3 / π) * V_LL_peak = (3√3 / π) * V_peak ≈ 1.654 * V_peak")
+    print("  (same as (3√2 / π) * V_LL_rms ≈ 1.35 * V_LL_rms)")
     
-    v_ideal_calculated = (3 * np.sqrt(2) / np.pi) * rect.params.v_peak
+    # Independent check: average the lossless max-selector waveform over one period
+    t = np.linspace(0, 1 / rect.params.frequency, 200000, endpoint=False)
+    Va, Vb, Vc = rect.generate_three_phase_ac(t)
+    v_ll_max = np.maximum.reduce([np.abs(Va - Vb), np.abs(Vb - Vc), np.abs(Vc - Va)])
+    v_ideal_numeric = v_ll_max.mean()
     v_ideal_from_method = rect.get_ideal_dc_voltage()
+    rel_err = abs(v_ideal_numeric - v_ideal_from_method) / v_ideal_numeric
     
-    print(f"\nFor V_ac_peak = {rect.params.v_peak}V:")
-    print(f"  Theoretical: {v_ideal_calculated:.2f}V")
-    print(f"  Simulation:  {v_ideal_from_method:.2f}V")
-    print(f"  Difference:  {abs(v_ideal_calculated - v_ideal_from_method):.6f}V")
+    print(f"\nFor V_peak = {rect.params.v_peak}V:")
+    print(f"  Waveform average: {v_ideal_numeric:.3f}V")
+    print(f"  Formula:          {v_ideal_from_method:.3f}V")
+    print(f"  Relative error:   {rel_err * 100:.4f}%")
     
-    if abs(v_ideal_calculated - v_ideal_from_method) < 0.001:
-        print("\n  ✓ VERIFIED: Formula implementation is correct (error < 0.1%)")
+    if rel_err < 0.001:
+        print("\n  ✓ VERIFIED: Formula matches the simulated waveform (error < 0.1%)")
     else:
-        print("\n  ✗ ERROR: Mismatch in formula")
+        print("\n  ✗ ERROR: Formula and simulated waveform disagree")
 
 
 def verify_voltage_sag_dependency():
@@ -100,20 +104,23 @@ def verify_voltage_sag_dependency():
     print(f"{'Load (A)':<10} {'Sag (V)':<12} {'Actual DC':<12} {'Loss %':<12} {'Regulation':<15}")
     print("-"*80)
     
+    losses = {}
     for load in [5, 10, 15, 20]:
         rect.params.load_current = load
         u_deg, v_sag = rect.calculate_commutation_angle()
         v_actual = rect.get_actual_dc_voltage()
         loss_pct = (v_sag / v_ideal) * 100
         regulation_loss = (1 - v_actual/v_ideal) * 100
+        losses[load] = loss_pct
         
         print(f"{load:<10} {v_sag:<12.3f} {v_actual:<12.2f} {loss_pct:<12.1f} {regulation_loss:<15.1f}%")
     
     print("\nKEY INSIGHT:")
-    print("  • Sag grows roughly linearly with load (physics of L*di/dt)")
-    print("  • Doubling load roughly doubles the sag")
-    print("  • At 10A: lose 17.7% of ideal voltage to commutation")
-    print("  • This is WHY voltage regulators are mandatory")
+    print("  • Sag is proportional to load current: ΔV = (3/π)·ω·Lc·Id")
+    print("  • Doubling the load doubles the sag")
+    print(f"  • At 10A: {losses[10]:.1f}% of the ideal voltage is lost to commutation")
+    print("  • 'Actual DC' also includes the two diode drops")
+    print("  • This is why a voltage regulator is needed")
     print("\n  ✓ VERIFIED: Behavior matches power electronics theory")
 
 

@@ -89,8 +89,10 @@ class ThreePhaseRectifier:
         diode commutation. As load current increases, µ increases, and the
         average DC voltage decreases.
         
-        Formula:
+        Formulas (6-pulse bridge, firing angle 0, V_peak = phase peak voltage):
             cos(µ) = 1 - (2 * ω * Lc * Id) / (√3 * V_peak)
+            ΔV     = (3 / π) * ω * Lc * Id
+                   = (3√3 * V_peak / (2π)) * (1 - cos(µ))
         
         Returns:
             u_deg: Commutation angle in degrees
@@ -105,33 +107,38 @@ class ThreePhaseRectifier:
         u_rad = np.arccos(cos_u)
         u_deg = np.degrees(u_rad)
         
-        # Voltage sag ≈ (3 * V_peak / π) * (cos(µ) - 1)
-        v_sag = (3 * self.params.v_peak / np.pi) * (cos_u - 1)
+        # Commutation voltage drop: ΔV = (3/π)·ω·Lc·Id, written in terms of µ so
+        # it stays bounded when µ is clipped at very high load.
+        v_sag = (3 * np.sqrt(3) * self.params.v_peak / (2 * np.pi)) * (1 - cos_u)
         
         return u_deg, abs(v_sag)
     
     def get_ideal_dc_voltage(self):
         """
-        Calculate the ideal average DC output voltage.
+        Calculate the ideal average DC output voltage (lossless bridge).
         
-        For a 6-pulse rectifier:
-            V_dc_ideal = (3 * √2 / π) * V_ac_peak ≈ 1.35 * V_ac_peak
+        For a 6-pulse bridge, the output averages the highest line-to-line
+        voltage over each 60° interval:
+            V_dc_ideal = (3 / π) * V_LL_peak = (3√3 / π) * V_peak ≈ 1.654 * V_peak
+        where V_peak is the phase peak voltage. This is the same as the usual
+        textbook form (3√2 / π) * V_LL_rms ≈ 1.35 * V_LL_rms.
         
         Returns:
             V_dc: Average DC voltage (volts)
         """
-        return (3 * np.sqrt(2) / np.pi) * self.params.v_peak
+        return (3 * np.sqrt(3) / np.pi) * self.params.v_peak
     
     def get_actual_dc_voltage(self):
         """
-        Calculate actual DC voltage accounting for commutation sag.
+        Calculate actual DC voltage: ideal value minus the two conducting
+        diode drops (as in rectify()) minus the commutation sag.
         
         Returns:
             V_dc_actual: Average DC voltage with load effects (volts)
         """
         V_dc_ideal = self.get_ideal_dc_voltage()
         u_deg, v_sag = self.calculate_commutation_angle()
-        return V_dc_ideal - v_sag
+        return V_dc_ideal - 2 * self.params.diode_forward_drop - v_sag
 
 
 def main():
